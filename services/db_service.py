@@ -1,20 +1,39 @@
-import os
-
-import sqlalchemy
-from fastapi import HTTPException
-from sqlalchemy import Column, Integer, String, Text, Table, Boolean, Float, DateTime
-from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy.exc import ProgrammingError, SQLAlchemyError, CompileError
-from sqlalchemy import text
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
 from dotenv import load_dotenv
+from fastapi import HTTPException
+from sqlalchemy import Column, Integer, String, Table, DateTime, inspect
+from sqlalchemy import text
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.exc import SQLAlchemyError, CompileError
+from sqlalchemy.testing.suite.test_reflection import metadata
 
 from services.logger import logger
 
 load_dotenv()
+
+
+def create_or_get_table_name(engine, metadata, table_name, json_data=None):
+    columns = [
+        Column("id", Integer, primary_key=True),
+        Column("created_at", DateTime, default=datetime.utcnow),
+        Column("updated_at", DateTime, default=datetime.utcnow, onupdate=datetime.utcnow),
+    ]
+
+    if json_data:
+        for key in json_data[0].keys():
+            if key not in ['id', 'created_at', 'updated_at']:
+                columns.append(Column(key, String(256), nullable=True))
+
+    table = Table(
+        table_name,
+        metadata,
+        *columns
+    )
+    metadata.create_all(engine)
+
+    return table
+
 
 def check_connection(engine):
     try:
@@ -32,26 +51,26 @@ def check_connection(engine):
         raise HTTPException(status_code=500, detail=f"❌ DB connection failed: {str(e)}")
 
 
-async def save_to_db(engine, metadata, data_list: list, table_name: str):
+async def save_to_db(engine, metadata, json_data: list, table_name: str):
     try:
-        logger.info("Start saving data to the database...")
+        logger.info(f"Start saving data to table '{table_name}'...")
         table = create_or_get_table_name(engine, metadata, table_name)
         conn = engine.connect()
         trans = conn.begin()
 
         table_columns = set(table.columns.keys())
 
-        for row in data_list:
-            filtered_row = {k: v for k, v in row.items() if k in table_columns}
-            extra_keys = set(row.keys()) - table_columns
+        for item in json_data:
+            filtered_item = {k: v for k, v in item.items() if k in table_columns}
+            extra_keys = set(item.keys()) - table_columns
             if extra_keys:
                 logger.warning(f"Skipping unused columns for table '{table_name}': {extra_keys}")
 
-            insert_stmt = insert(table).values(**filtered_row)
+            insert_stmt = insert(table).values(**filtered_item)
             conn.execute(insert_stmt)
 
         trans.commit()
-        logger.info("Data saved successfully")
+        logger.info(f"Data saved successfully to table '{table_name}'")
     except CompileError as e:
         logger.error(f"CompileError: {str(e)}")
         if 'trans' in locals():
