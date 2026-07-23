@@ -15,3 +15,7 @@ class CommentRead(BaseModel):
     parent_id: UUID | None
     body: str
     created_at: datetime
+
+
+class CommentVisibilityUpdate(BaseModel):
+    is_hidden: bool

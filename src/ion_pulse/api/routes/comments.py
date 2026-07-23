@@ -8,15 +8,22 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ion_pulse.api.routes.auth import get_current_user
 from ion_pulse.db.session import get_db_session
 from ion_pulse.domain.publications import PublicationStatus
+from ion_pulse.domain.roles import RoleCode
 from ion_pulse.models.identity import User
 from ion_pulse.models.publications import Publication, PublicationComment
-from ion_pulse.schemas.comments import CommentCreate, CommentRead
+from ion_pulse.schemas.comments import CommentCreate, CommentRead, CommentVisibilityUpdate
 
 router = APIRouter(prefix="/publications")
 
 
 def to_comment(comment: PublicationComment) -> CommentRead:
     return CommentRead.model_validate(comment, from_attributes=True)
+
+
+def require_moderation_access(user: User) -> None:
+    allowed_roles = {RoleCode.MODERATOR.value, RoleCode.ADMINISTRATOR.value}
+    if not allowed_roles.intersection(role.code for role in user.roles):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Moderator role required")
 
 
 @router.get("/{publication_id}/comments", response_model=list[CommentRead])
@@ -52,6 +59,23 @@ async def create_comment(
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid comment parent")
     comment = PublicationComment(publication_id=publication.id, author_id=user.id, **payload.model_dump())
     session.add(comment)
+    await session.commit()
+    await session.refresh(comment)
+    return to_comment(comment)
+
+
+@router.patch("/comments/{comment_id}/visibility", response_model=CommentRead)
+async def update_comment_visibility(
+    comment_id: str,
+    payload: CommentVisibilityUpdate,
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    user: Annotated[User, Depends(get_current_user)],
+) -> CommentRead:
+    require_moderation_access(user)
+    comment = await session.get(PublicationComment, comment_id)
+    if comment is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found")
+    comment.is_hidden = payload.is_hidden
     await session.commit()
     await session.refresh(comment)
     return to_comment(comment)
