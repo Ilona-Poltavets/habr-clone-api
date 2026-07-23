@@ -25,7 +25,7 @@ class DraftRead(BaseModel):
 
 class EditorialDecisionCreate(BaseModel):
     decision: str = Field(pattern="^(publish|reject|request_changes)$")
-    note: str | None = Field(default=None, max_length=1000)
+    note: str = Field(min_length=1, max_length=1000)
 
 
 class DraftUpdate(BaseModel):

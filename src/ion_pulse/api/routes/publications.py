@@ -154,7 +154,18 @@ async def submit_draft(
     if result is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Draft not found")
     publication, localization, category = result
+    previous_status = publication.status
     publication.status = PublicationStatus.EDITORIAL_REVIEW.value
+    session.add(
+        PublicationEditorialReview(
+            publication_id=publication.id,
+            reviewer_id=user.id,
+            decision="submit",
+            from_status=previous_status,
+            to_status=publication.status,
+            note="Submitted for editorial review",
+        )
+    )
     await session.commit()
     await session.refresh(publication)
     return to_draft(publication, localization, category)
@@ -188,11 +199,6 @@ async def make_editorial_decision(
 ) -> DraftRead:
     require_editorial_access(user)
     decision = EditorialDecision(payload.decision)
-    if decision in {EditorialDecision.REJECT, EditorialDecision.REQUEST_CHANGES} and not payload.note:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="A note is required when rejecting or requesting changes",
-        )
     row = await session.execute(
         select(Publication, PublicationLocalization, Category)
         .join(PublicationLocalization, PublicationLocalization.publication_id == Publication.id)
@@ -208,6 +214,7 @@ async def make_editorial_decision(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Publication awaiting review not found")
 
     publication, localization, category = result
+    previous_status = publication.status
     publication.status = resolve_editorial_decision(decision).value
     if publication.status == PublicationStatus.PUBLISHED.value:
         publication.published_at = datetime.now(UTC)
@@ -222,6 +229,8 @@ async def make_editorial_decision(
             publication_id=publication.id,
             reviewer_id=user.id,
             decision=decision.value,
+            from_status=previous_status,
+            to_status=publication.status,
             note=payload.note,
         )
     )
