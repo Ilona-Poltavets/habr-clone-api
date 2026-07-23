@@ -84,3 +84,18 @@ class TranslationJob(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+
+
+class PublicationRating(Base):
+    __tablename__ = "publication_ratings"
+
+    publication_id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True), ForeignKey("publications.id", ondelete="CASCADE"), primary_key=True
+    )
+    user_id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    value: Mapped[int] = mapped_column()
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
