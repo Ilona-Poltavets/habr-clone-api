@@ -1,11 +1,16 @@
 import asyncio
 
 from ion_pulse.db.session import async_session_factory, engine
-from ion_pulse.services.translations import UnconfiguredTranslator, process_next_translation_job
+from ion_pulse.services.translations import (
+    UnconfiguredTranslator,
+    process_next_translation_job,
+    requeue_failed_translation_jobs,
+)
 
 
 async def run_once() -> bool:
     async with async_session_factory() as session:
+        await requeue_failed_translation_jobs(session)
         return await process_next_translation_job(session, UnconfiguredTranslator())
 
 

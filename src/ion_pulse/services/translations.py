@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Protocol
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ion_pulse.domain.publications import translation_target_locale
@@ -122,6 +122,15 @@ async def process_next_translation_job(session: AsyncSession, translator: Transl
     job.last_error = None
     await session.commit()
     return True
+
+
+async def requeue_failed_translation_jobs(session: AsyncSession, max_attempts: int = 3) -> None:
+    await session.execute(
+        update(TranslationJob)
+        .where(TranslationJob.status == "failed", TranslationJob.attempts < max_attempts)
+        .values(status="pending", last_error=None)
+    )
+    await session.commit()
 
 
 def expected_target_locale(source_locale: str) -> str:

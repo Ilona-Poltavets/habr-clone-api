@@ -23,6 +23,18 @@ class DraftRead(BaseModel):
     created_at: datetime
 
 
+class PublishedPublicationRead(BaseModel):
+    id: UUID
+    category_slug: str
+    source_locale: str
+    locale: str
+    translation_available: bool
+    title: str
+    summary: str
+    body: str
+    published_at: datetime
+
+
 class EditorialDecisionCreate(BaseModel):
     decision: str = Field(pattern="^(publish|reject|request_changes)$")
     note: str = Field(min_length=1, max_length=1000)

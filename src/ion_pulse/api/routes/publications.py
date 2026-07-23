@@ -27,6 +27,7 @@ from ion_pulse.schemas.publications import (
     DraftRead,
     DraftUpdate,
     EditorialDecisionCreate,
+    PublishedPublicationRead,
 )
 
 router = APIRouter(prefix="/publications")
@@ -49,6 +50,27 @@ def require_editorial_access(user: User) -> None:
     allowed_roles = {RoleCode.EDITOR.value, RoleCode.ADMINISTRATOR.value}
     if not allowed_roles.intersection(role.code for role in user.roles):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Editor role required")
+
+
+def to_published(
+    publication: Publication,
+    localization: PublicationLocalization,
+    category: Category,
+    requested_locale: str,
+) -> PublishedPublicationRead:
+    if publication.published_at is None:
+        raise ValueError("Published publication must have a published date")
+    return PublishedPublicationRead(
+        id=publication.id,
+        category_slug=category.slug,
+        source_locale=publication.source_locale,
+        locale=localization.locale,
+        translation_available=localization.locale == requested_locale,
+        title=localization.title,
+        summary=localization.summary,
+        body=localization.body,
+        published_at=publication.published_at,
+    )
 
 
 @router.post("/drafts", response_model=DraftRead, status_code=status.HTTP_201_CREATED)
@@ -93,6 +115,44 @@ async def list_my_publications(
         .order_by(Publication.updated_at.desc())
     )
     return [to_draft(publication, localization, category) for publication, localization, category in rows]
+
+
+@router.get("/published/{publication_id}", response_model=PublishedPublicationRead)
+async def get_published_publication(
+    publication_id: str,
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    locale: str = "ru",
+) -> PublishedPublicationRead:
+    if locale not in {"ru", "en"}:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unsupported locale")
+    row = await session.execute(
+        select(Publication, PublicationLocalization, Category)
+        .join(PublicationLocalization, PublicationLocalization.publication_id == Publication.id)
+        .join(Category, Category.id == Publication.category_id)
+        .where(
+            Publication.id == publication_id,
+            Publication.status == PublicationStatus.PUBLISHED.value,
+            PublicationLocalization.locale == locale,
+            PublicationLocalization.translation_status == "ready",
+        )
+    )
+    result = row.one_or_none()
+    if result is None:
+        row = await session.execute(
+            select(Publication, PublicationLocalization, Category)
+            .join(PublicationLocalization, PublicationLocalization.publication_id == Publication.id)
+            .join(Category, Category.id == Publication.category_id)
+            .where(
+                Publication.id == publication_id,
+                Publication.status == PublicationStatus.PUBLISHED.value,
+                PublicationLocalization.locale == Publication.source_locale,
+            )
+        )
+        result = row.one_or_none()
+    if result is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Published publication not found")
+    publication, localization, category = result
+    return to_published(publication, localization, category, locale)
 
 
 @router.patch("/{publication_id}/draft", response_model=DraftRead)
