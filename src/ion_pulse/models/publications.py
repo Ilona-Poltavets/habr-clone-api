@@ -40,3 +40,22 @@ class PublicationLocalization(Base):
     origin: Mapped[str] = mapped_column(String(20), server_default="original")
     source_revision: Mapped[int] = mapped_column(default=1)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class PublicationEditorialReview(Base):
+    __tablename__ = "publication_editorial_reviews"
+
+    id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), primary_key=True, default=uuid4)
+    publication_id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        ForeignKey("publications.id", ondelete="CASCADE"),
+        index=True,
+    )
+    reviewer_id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="RESTRICT"),
+        index=True,
+    )
+    decision: Mapped[str] = mapped_column(String(30))
+    note: Mapped[str | None] = mapped_column(String(1000), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

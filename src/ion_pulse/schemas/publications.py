@@ -21,3 +21,8 @@ class DraftRead(BaseModel):
     summary: str
     body: str
     created_at: datetime
+
+
+class EditorialDecisionCreate(BaseModel):
+    decision: str = Field(pattern="^(publish|reject|request_changes)$")
+    note: str | None = Field(default=None, max_length=1000)
