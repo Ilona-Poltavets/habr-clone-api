@@ -38,6 +38,7 @@ class PublicationLocalization(Base):
     summary: Mapped[str] = mapped_column(String(500))
     body: Mapped[str] = mapped_column(Text)
     origin: Mapped[str] = mapped_column(String(20), server_default="original")
+    translation_status: Mapped[str] = mapped_column(String(20), server_default="ready")
     source_revision: Mapped[int] = mapped_column(default=1)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 

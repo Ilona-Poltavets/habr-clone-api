@@ -15,6 +15,11 @@ class ContentLocale(StrEnum):
     ENGLISH = "en"
 
 
+def translation_target_locale(source_locale: ContentLocale | str) -> ContentLocale:
+    locale = ContentLocale(source_locale)
+    return ContentLocale.ENGLISH if locale is ContentLocale.RUSSIAN else ContentLocale.RUSSIAN
+
+
 class EditorialDecision(StrEnum):
     PUBLISH = "publish"
     REJECT = "reject"
