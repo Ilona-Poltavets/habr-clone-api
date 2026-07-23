@@ -7,6 +7,7 @@ from ion_pulse.models.publications import (
     Publication,
     PublicationEditorialReview,
     PublicationLocalization,
+    TranslationJob,
 )
 
-__all__ = ["AuthorApplication", "Category", "Publication", "PublicationEditorialReview", "PublicationLocalization", "Role", "User", "UserRole", "UserSession"]
+__all__ = ["AuthorApplication", "Category", "Publication", "PublicationEditorialReview", "PublicationLocalization", "Role", "TranslationJob", "User", "UserRole", "UserSession"]

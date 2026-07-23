@@ -26,3 +26,10 @@ class DraftRead(BaseModel):
 class EditorialDecisionCreate(BaseModel):
     decision: str = Field(pattern="^(publish|reject|request_changes)$")
     note: str | None = Field(default=None, max_length=1000)
+
+
+class DraftUpdate(BaseModel):
+    category_slug: str = Field(pattern="^(reviews|news|guides|esports)$")
+    title: str = Field(min_length=5, max_length=240)
+    summary: str = Field(min_length=20, max_length=500)
+    body: str = Field(min_length=50)

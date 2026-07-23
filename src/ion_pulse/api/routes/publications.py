@@ -20,8 +20,14 @@ from ion_pulse.models.publications import (
     Publication,
     PublicationEditorialReview,
     PublicationLocalization,
+    TranslationJob,
 )
-from ion_pulse.schemas.publications import DraftCreate, DraftRead, EditorialDecisionCreate
+from ion_pulse.schemas.publications import (
+    DraftCreate,
+    DraftRead,
+    DraftUpdate,
+    EditorialDecisionCreate,
+)
 
 router = APIRouter(prefix="/publications")
 
@@ -89,6 +95,42 @@ async def list_my_publications(
     return [to_draft(publication, localization, category) for publication, localization, category in rows]
 
 
+@router.patch("/{publication_id}/draft", response_model=DraftRead)
+async def update_draft(
+    publication_id: str,
+    payload: DraftUpdate,
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    user: Annotated[User, Depends(get_current_user)],
+) -> DraftRead:
+    row = await session.execute(
+        select(Publication, PublicationLocalization, Category)
+        .join(PublicationLocalization, PublicationLocalization.publication_id == Publication.id)
+        .join(Category, Category.id == Publication.category_id)
+        .where(
+            Publication.id == publication_id,
+            Publication.author_id == user.id,
+            Publication.status.in_(
+                [PublicationStatus.DRAFT.value, PublicationStatus.CHANGES_REQUESTED.value]
+            ),
+            PublicationLocalization.locale == Publication.source_locale,
+        )
+    )
+    result = row.one_or_none()
+    if result is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Editable draft not found")
+    publication, localization, _ = result
+    category = await session.scalar(select(Category).where(Category.slug == payload.category_slug))
+    if category is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unknown category")
+    publication.category_id = category.id
+    localization.title = payload.title
+    localization.summary = payload.summary
+    localization.body = payload.body
+    await session.commit()
+    await session.refresh(publication)
+    return to_draft(publication, localization, category)
+
+
 @router.post("/{publication_id}/submit", response_model=DraftRead)
 async def submit_draft(
     publication_id: str,
@@ -102,7 +144,9 @@ async def submit_draft(
         .where(
             Publication.id == publication_id,
             Publication.author_id == user.id,
-            Publication.status == "draft",
+            Publication.status.in_(
+                [PublicationStatus.DRAFT.value, PublicationStatus.CHANGES_REQUESTED.value]
+            ),
             PublicationLocalization.locale == Publication.source_locale,
         )
     )
@@ -167,6 +211,12 @@ async def make_editorial_decision(
     publication.status = resolve_editorial_decision(decision).value
     if publication.status == PublicationStatus.PUBLISHED.value:
         publication.published_at = datetime.now(UTC)
+        session.add(
+            TranslationJob(
+                publication_id=publication.id,
+                target_locale="en" if publication.source_locale == "ru" else "ru",
+            )
+        )
     session.add(
         PublicationEditorialReview(
             publication_id=publication.id,

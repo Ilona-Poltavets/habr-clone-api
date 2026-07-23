@@ -48,7 +48,7 @@ class PublicationEditorialReview(Base):
     id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), primary_key=True, default=uuid4)
     publication_id: Mapped[UUID] = mapped_column(
         PostgreSQLUUID(as_uuid=True),
-        ForeignKey("publications.id", ondelete="CASCADE"),
+        ForeignKey("publications.id", ondelete="RESTRICT"),
         index=True,
     )
     reviewer_id: Mapped[UUID] = mapped_column(
@@ -59,3 +59,25 @@ class PublicationEditorialReview(Base):
     decision: Mapped[str] = mapped_column(String(30))
     note: Mapped[str | None] = mapped_column(String(1000), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class TranslationJob(Base):
+    __tablename__ = "translation_jobs"
+    __table_args__ = (UniqueConstraint("publication_id", "target_locale"),)
+
+    id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), primary_key=True, default=uuid4)
+    publication_id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        ForeignKey("publications.id", ondelete="CASCADE"),
+        index=True,
+    )
+    target_locale: Mapped[str] = mapped_column(String(5))
+    status: Mapped[str] = mapped_column(String(20), server_default="pending")
+    attempts: Mapped[int] = mapped_column(default=0, server_default="0")
+    last_error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
