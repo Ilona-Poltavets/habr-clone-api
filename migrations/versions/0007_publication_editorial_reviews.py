@@ -18,6 +18,14 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
+    # Older Alembic installations create this bookkeeping column as VARCHAR(32),
+    # while this and later descriptive revision IDs are longer.
+    op.alter_column(
+        "alembic_version",
+        "version_num",
+        existing_type=sa.String(length=32),
+        type_=sa.String(length=64),
+    )
     op.create_table(
         "publication_editorial_reviews",
         sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),

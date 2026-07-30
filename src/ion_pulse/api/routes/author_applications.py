@@ -10,7 +10,7 @@ from ion_pulse.api.routes.auth import get_current_user
 from ion_pulse.db.session import get_db_session
 from ion_pulse.domain.author_applications import AuthorApplicationStatus
 from ion_pulse.domain.roles import RoleCode
-from ion_pulse.models.identity import AuthorApplication, Role, User, UserRole
+from ion_pulse.models.identity import AuthorApplication, Role, User, UserRole, UserRoleAudit
 from ion_pulse.schemas.author_applications import (
     AuthorApplicationCreate,
     AuthorApplicationDecision,
@@ -107,6 +107,14 @@ async def decide_application(
         existing = await session.get(UserRole, {"user_id": application.user_id, "role_id": role.id})
         if existing is None:
             session.add(UserRole(user_id=application.user_id, role_id=role.id))
+            session.add(
+                UserRoleAudit(
+                    user_id=application.user_id,
+                    actor_id=user.id,
+                    role_code=RoleCode.AUTHOR.value,
+                    action="granted",
+                )
+            )
     await session.commit()
     await session.refresh(application)
     return to_response(application)

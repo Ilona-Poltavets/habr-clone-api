@@ -1,21 +1,61 @@
 """SQLAlchemy ORM models."""
-# ruff: noqa: E501
 
 from ion_pulse.models.identity import (
+    AccountDeletionAudit,
     AuthorApplication,
     AuthorSubscription,
+    PasswordResetToken,
     Role,
     User,
     UserRole,
+    UserRoleAudit,
+    UserSanction,
+    UserSanctionAppeal,
     UserSession,
 )
 from ion_pulse.models.publications import (
     Category,
+    CommentModerationAction,
+    ContentReport,
+    DigestPublication,
+    Game,
+    GameSubscription,
+    JournalIssue,
+    JournalIssuePublication,
     Publication,
+    PublicationAiReview,
     PublicationEditorialReview,
     PublicationLocalization,
     PublicationRating,
+    PublicationRevision,
     TranslationJob,
 )
 
-__all__ = ["AuthorApplication", "AuthorSubscription", "Category", "Publication", "PublicationEditorialReview", "PublicationLocalization", "PublicationRating", "Role", "TranslationJob", "User", "UserRole", "UserSession"]
+__all__ = [
+    "AccountDeletionAudit",
+    "AuthorApplication",
+    "AuthorSubscription",
+    "Category",
+    "CommentModerationAction",
+    "ContentReport",
+    "DigestPublication",
+    "Game",
+    "GameSubscription",
+    "JournalIssue",
+    "JournalIssuePublication",
+    "PasswordResetToken",
+    "Publication",
+    "PublicationAiReview",
+    "PublicationEditorialReview",
+    "PublicationLocalization",
+    "PublicationRating",
+    "PublicationRevision",
+    "Role",
+    "TranslationJob",
+    "User",
+    "UserRole",
+    "UserRoleAudit",
+    "UserSanction",
+    "UserSanctionAppeal",
+    "UserSession",
+]

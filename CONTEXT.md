@@ -1,112 +1,100 @@
 # Ion Pulse
 
-Словарь предметной области двуязычной игровой медиаплатформы. Термины ниже
-используются одинаково в продуктовых текстах, задачах, API и интерфейсе.
+Domain glossary for the bilingual gaming media platform. The terms below are
+used consistently in product copy, tasks, the API, and the interface.
 
-## Люди и доступ
+## People and access
 
-**Гость**:
-Незарегистрированный посетитель платформы.
-_Избегать_: анонимный пользователь, роль гостя
+**Guest**:
+An unregistered visitor to the platform.
+_Avoid_: anonymous user, guest role
 
-**Участник**:
-Зарегистрированный пользователь с базовыми возможностями сообщества и создания
-материалов.
-_Избегать_: подписчик, обычный пользователь
+**Member**:
+A registered user with core community and content-creation capabilities.
+_Avoid_: subscriber, regular user
 
-**Автор**:
-Верифицированный участник, которому разрешён упрощённый путь публикации.
-_Избегать_: блогер, создатель
+**Author**:
+A verified member allowed to use a simplified publication path.
+_Avoid_: blogger, creator
 
-**Редактор**:
-Участник с полномочиями принимать редакционные решения по материалам и их
-локализациям.
-_Избегать_: проверяющий
+**Editor**:
+A member authorized to make editorial decisions about materials and their localizations.
+_Avoid_: reviewer
 
-**Модератор**:
-Участник, отвечающий за правила сообщества, жалобы, спам и санкции.
-_Избегать_: редактор комментариев
+**Moderator**:
+A member responsible for community rules, reports, spam, and sanctions.
+_Avoid_: comment editor
 
-**Контент-менеджер**:
-Участник, управляющий структурой, оформлением и продвижением контента, но не
-редакционными решениями.
-_Избегать_: администратор сайта
+**Content manager**:
+A member who manages content structure, presentation, and promotion, but not editorial decisions.
+_Avoid_: site administrator
 
-**Администратор**:
-Участник с полным доступом к настройкам, ролям и управлению платформой.
-_Избегать_: владелец
+**Administrator**:
+A member with full access to settings, roles, and platform administration.
+_Avoid_: owner
 
-**Роль**:
-Назначаемый набор дополнительных полномочий участника; один участник может иметь
-несколько ролей.
-_Избегать_: тип пользователя, уровень аккаунта
+**Role**:
+An assignable set of extra permissions; a member may have multiple roles.
+_Avoid_: user type, account level
 
-**Заявка автора**:
-Формальный запрос участника на получение роли автора.
-_Избегать_: верификация аккаунта
+**Author application**:
+A member's formal request for the author role.
+_Avoid_: account verification
 
-## Публикации
+## Publications
 
-**Материал**:
-Создаваемый участником редакционный контент до или независимо от его публикации.
-_Избегать_: пост, запись
+**Material**:
+Editorial content created by a member before, or independently of, publication.
+_Avoid_: post, entry
 
-**Публикация**:
-Материал, доступный читателям на платформе.
-_Избегать_: статья, пост
+**Publication**:
+A material available to readers on the platform.
+_Avoid_: article, post
 
-**Оригинал**:
-Локализация материала на языке, на котором его создал автор; источник истины для
-автоматических переводов.
-_Избегать_: главная версия
+**Original**:
+A material localization in its author's language; the source of truth for automated translations.
+_Avoid_: main version
 
-**Локализация**:
-Представление одного материала на конкретном языке, являющееся оригиналом,
-автоматическим переводом или отредактированным переводом.
-_Избегать_: языковая копия, отдельный пост
+**Localization**:
+A representation of one material in a specific language: an original, automated translation, or edited translation.
+_Avoid_: language copy, separate post
 
-**Ревизия**:
-Зафиксированная версия содержания материала или редакционного выпуска.
-_Избегать_: копия, сохранение
+**Revision**:
+A recorded version of a material or editorial issue.
+_Avoid_: copy, save
 
-**Редакционная проверка**:
-Решение редактора опубликовать, вернуть на доработку или отклонить материал.
-_Избегать_: модерация статьи
+**Editorial review**:
+An editor's decision to publish, return for changes, or reject a material.
+_Avoid_: article moderation
 
-**ИИ-проверка**:
-Автоматическая оценка рисков материала, направляющая workflow, но не являющаяся
-человеческим редакционным решением.
-_Избегать_: ИИ-модератор, цензор
+**AI review**:
+An automated material risk assessment that guides the workflow but is not a human editorial decision.
+_Avoid_: AI moderator, censor
 
-## Редакционные продукты
+## Editorial products
 
-**Журнал**:
-Еженедельный визуально скомпонованный выпуск из выбранных публикаций с обложкой,
-оглавлением и страницами.
-_Избегать_: дайджест, подборка
+**Journal**:
+A weekly visually composed issue of selected publications with a cover, contents, and pages.
+_Avoid_: digest, roundup
 
-**Дайджест**:
-Еженедельная публикация с вручную написанным обзором и ссылками на важные
-материалы.
-_Избегать_: журнал, автоматическая подборка
+**Digest**:
+A weekly publication with a manually written overview and links to important materials.
+_Avoid_: journal, automated roundup
 
-**Выпуск**:
-Опубликованная и версионируемая единица журнала за явно заданный недельный
-период.
-_Избегать_: номер страницы
+**Issue**:
+A published, versioned unit of the journal for an explicit weekly period.
+_Avoid_: page number
 
-## Сообщество
+## Community
 
-**Подписка**:
-Связь участника с автором или игрой для получения их обновлений.
-_Избегать_: роль подписчика
+**Subscription**:
+A member's connection to an author or game to receive updates.
+_Avoid_: subscriber role
 
-**Оценка публикации**:
-Изменяемое мнение одного участника о публикации, учитываемое в агрегированных
-метриках.
-_Избегать_: лайк, рейтинг автора
+**Publication rating**:
+A member's changeable opinion of a publication, used in aggregate metrics.
+_Avoid_: like, author rating
 
-**Жалоба**:
-Запрос участника на ручную проверку публикации или комментария из-за возможного
-нарушения правил.
-_Избегать_: бан, нарушение
+**Report**:
+A member's request for manual review of a publication or comment due to a possible rule violation.
+_Avoid_: ban, violation

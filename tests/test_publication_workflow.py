@@ -11,6 +11,7 @@ from ion_pulse.domain.publications import (
 @pytest.mark.parametrize(
     ("decision", "expected_status"),
     [
+        (EditorialDecision.SCHEDULE, PublicationStatus.SCHEDULED),
         (EditorialDecision.PUBLISH, PublicationStatus.PUBLISHED),
         (EditorialDecision.REJECT, PublicationStatus.REJECTED),
         (EditorialDecision.REQUEST_CHANGES, PublicationStatus.CHANGES_REQUESTED),
@@ -26,6 +27,10 @@ def test_editorial_decision_resolves_to_expected_publication_status(
 def test_unknown_editorial_decision_is_rejected() -> None:
     with pytest.raises(ValueError, match="Unsupported editorial decision"):
         resolve_editorial_decision("archive")
+
+
+def test_archived_status_is_part_of_the_publication_lifecycle() -> None:
+    assert PublicationStatus.ARCHIVED.value == "archived"
 
 
 @pytest.mark.parametrize(("source", "target"), [("ru", "en"), ("en", "ru")])

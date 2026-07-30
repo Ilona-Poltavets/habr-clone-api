@@ -25,6 +25,10 @@ async def set_publication_rating(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Published publication not found"
         )
+    if publication.author_id == user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Cannot rate your own publication"
+        )
     rating = await session.get(
         PublicationRating, {"publication_id": publication.id, "user_id": user.id}
     )

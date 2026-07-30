@@ -19,3 +19,8 @@ class CommentRead(BaseModel):
 
 class CommentVisibilityUpdate(BaseModel):
     is_hidden: bool
+
+
+class ModeratedCommentRead(CommentRead):
+    publication_id: UUID
+    is_hidden: bool

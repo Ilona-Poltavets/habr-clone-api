@@ -23,3 +23,8 @@ def create_session_token() -> str:
 def hash_session_token(token: str) -> str:
     secret = get_settings().session_secret
     return sha256(f"{secret}:{token}".encode()).hexdigest()
+
+
+def hash_password_reset_token(token: str) -> str:
+    secret = get_settings().session_secret
+    return sha256(f"password-reset:{secret}:{token}".encode()).hexdigest()
