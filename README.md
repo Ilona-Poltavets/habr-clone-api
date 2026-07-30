@@ -49,6 +49,11 @@ a bootstrap administrator, set `ION_PULSE_BOOTSTRAP_ADMIN_EMAIL` and
 uv run python -m ion_pulse.seeds
 ```
 
+For a local demo, the seed also creates five accounts and five published,
+fully localized materials. All demo accounts use `IonPulseDemo2026!`:
+`admin@ion-pulse.local`, `editor@ion-pulse.local`, `author@ion-pulse.local`,
+`moderator@ion-pulse.local`, and `player@ion-pulse.local`.
+
 The command is idempotent and never stores a password in source control.
 To deliberately reset an existing bootstrap account password, run it once with
 `ION_PULSE_BOOTSTRAP_ADMIN_RESET_PASSWORD=true`, then remove that setting.

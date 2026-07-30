@@ -629,9 +629,10 @@ async def get_published_publication(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unsupported locale"
         )
     row = await session.execute(
-        select(Publication, PublicationLocalization, Category)
+        select(Publication, PublicationLocalization, Category, User)
         .join(PublicationLocalization, PublicationLocalization.publication_id == Publication.id)
         .join(Category, Category.id == Publication.category_id)
+        .join(User, User.id == Publication.author_id)
         .where(
             Publication.id == publication_id,
             Publication.status == PublicationStatus.PUBLISHED.value,
