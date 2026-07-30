@@ -1,4 +1,3 @@
-# ruff: noqa: E501
 from datetime import UTC, datetime
 from typing import Annotated
 

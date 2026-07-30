@@ -5,7 +5,6 @@ Revises: 0003_author_applications
 Create Date: 2026-07-23
 """
 
-# ruff: noqa: E501
 from collections.abc import Sequence
 
 import sqlalchemy as sa

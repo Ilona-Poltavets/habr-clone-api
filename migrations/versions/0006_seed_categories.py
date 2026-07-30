@@ -5,7 +5,6 @@ Revises: 0005_publication_foundation
 Create Date: 2026-07-23
 """
 
-# ruff: noqa: E501
 from collections.abc import Sequence
 from uuid import UUID
 
