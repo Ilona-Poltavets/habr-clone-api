@@ -20,4 +20,4 @@ class AuthorApplicationRead(BaseModel):
 
 class AuthorApplicationDecision(BaseModel):
     status: str = Field(pattern="^(approved|rejected)$")
-    review_note: str | None = Field(default=None, max_length=1000)
+    review_note: str = Field(min_length=1, max_length=1000)
