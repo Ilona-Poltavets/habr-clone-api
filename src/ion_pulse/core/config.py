@@ -40,6 +40,7 @@ class Settings(BaseSettings):
     translation_api_base_url: str = "https://api.openai.com/v1"
     translation_api_key: str | None = None
     translation_model: str = "gpt-4.1-mini"
+    worker_poll_seconds: int = 30
     bootstrap_admin_email: str | None = None
     bootstrap_admin_password: str | None = None
     bootstrap_admin_display_name: str = "admin"

@@ -88,9 +88,9 @@ enforce equivalent distributed limits at the edge/load balancer.
 
 ### Background work
 
-The one-shot worker publishes materials whose scheduled UTC time has arrived,
-then processes translation jobs. Run it regularly from a scheduler in the
-deployment environment:
+The worker publishes scheduled materials, then processes AI-review and translation
+jobs continuously. Run one worker process beside the API in production; it polls
+every 30 seconds when idle (configure `ION_PULSE_WORKER_POLL_SECONDS` as needed):
 
 ```bash
 uv run python -m ion_pulse.workers.translation
