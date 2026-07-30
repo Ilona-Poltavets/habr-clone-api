@@ -25,7 +25,7 @@ class OpenAiCompatibleTranslator:
         system_prompt = (
             f"Translate the supplied Ion Pulse game-media content from {source_locale} to "
             f"{target_locale}. Preserve meaning, links, and paragraph structure. Return only "
-            'JSON with non-empty string fields: title, summary, body.'
+            "JSON with non-empty string fields: title, summary, body."
         )
         async with httpx.AsyncClient(timeout=90) as client:
             response = await client.post(

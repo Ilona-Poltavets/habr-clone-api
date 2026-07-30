@@ -21,9 +21,7 @@ class OpenAiCompatibleReviewer:
         self.model = model
         self.rules_version = rules_version
 
-    async def review(
-        self, *, title: str, summary: str, body: str, locale: str
-    ) -> AiReviewResult:
+    async def review(self, *, title: str, summary: str, body: str, locale: str) -> AiReviewResult:
         async with httpx.AsyncClient(timeout=60) as client:
             response = await client.post(
                 f"{self.api_base_url}/chat/completions",

@@ -26,7 +26,9 @@ def to_response(application: AuthorApplication) -> AuthorApplicationRead:
 
 def require_administrator(user: User) -> None:
     if RoleCode.ADMINISTRATOR.value not in {role.code for role in user.roles}:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Administrator role required")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Administrator role required"
+        )
 
 
 @router.get("/me", response_model=AuthorApplicationRead | None)
@@ -81,7 +83,13 @@ async def list_submitted_applications(
     user: Annotated[User, Depends(get_current_user)],
 ) -> list[AuthorApplicationRead]:
     require_administrator(user)
-    applications = (await session.scalars(select(AuthorApplication).where(AuthorApplication.status == AuthorApplicationStatus.SUBMITTED.value))).all()
+    applications = (
+        await session.scalars(
+            select(AuthorApplication).where(
+                AuthorApplication.status == AuthorApplicationStatus.SUBMITTED.value
+            )
+        )
+    ).all()
     return [to_response(application) for application in applications]
 
 
@@ -95,7 +103,9 @@ async def decide_application(
     require_administrator(user)
     application = await session.get(AuthorApplication, application_id)
     if application is None or application.status != AuthorApplicationStatus.SUBMITTED.value:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Submitted application not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Submitted application not found"
+        )
     application.status = payload.status
     application.review_note = payload.review_note
     application.reviewed_at = datetime.now(UTC)
@@ -103,7 +113,9 @@ async def decide_application(
     if payload.status == AuthorApplicationStatus.APPROVED.value:
         role = await session.scalar(select(Role).where(Role.code == RoleCode.AUTHOR.value))
         if role is None:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Author role missing")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Author role missing"
+            )
         existing = await session.get(UserRole, {"user_id": application.user_id, "role_id": role.id})
         if existing is None:
             session.add(UserRole(user_id=application.user_id, role_id=role.id))

@@ -80,9 +80,7 @@ async def update_user_roles(
     requested = set(payload.roles)
     valid = {role.value for role in RoleCode}
     if not requested <= valid:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unknown role"
-        )
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unknown role")
     user = await session.scalar(
         select(User).options(selectinload(User.roles)).where(User.id == user_id)
     )

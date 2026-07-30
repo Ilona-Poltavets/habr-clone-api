@@ -27,13 +27,20 @@ def upgrade() -> None:
         sa.Column("parent_id", postgresql.UUID(as_uuid=True)),
         sa.Column("body", sa.Text(), nullable=False),
         sa.Column("is_hidden", sa.Boolean(), server_default=sa.text("false"), nullable=False),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("CURRENT_TIMESTAMP"),
+            nullable=False,
+        ),
         sa.ForeignKeyConstraint(["author_id"], ["users.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["parent_id"], ["publication_comments.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["publication_id"], ["publications.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_publication_comments_publication_id", "publication_comments", ["publication_id"])
+    op.create_index(
+        "ix_publication_comments_publication_id", "publication_comments", ["publication_id"]
+    )
 
 
 def downgrade() -> None:
