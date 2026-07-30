@@ -1,0 +1,17 @@
+[Unit]
+Description=Ion Pulse API
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+WorkingDirectory=/srv/ion-pulse-api
+EnvironmentFile=/etc/ion-pulse/api.env
+ExecStart=/usr/local/bin/uv run uvicorn ion_pulse.main:app --host 127.0.0.1 --port 8000 --proxy-headers
+Restart=always
+RestartSec=5
+User=ion-pulse
+Group=ion-pulse
+
+[Install]
+WantedBy=multi-user.target

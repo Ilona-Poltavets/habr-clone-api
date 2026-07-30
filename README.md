@@ -96,9 +96,27 @@ every 30 seconds when idle (configure `ION_PULSE_WORKER_POLL_SECONDS` as needed)
 uv run python -m ion_pulse.workers.translation
 ```
 
-A systemd unit template is included at `deploy/ion-pulse-worker.service`. Install it alongside
-the API service, set its `WorkingDirectory`, user and `EnvironmentFile`, then enable it with
-`systemctl enable --now ion-pulse-worker`.
+## Systemd deployment templates
+
+Templates for both long-running processes are included in `deploy/`:
+
+- `ion-pulse-api.service` starts Uvicorn on the loopback interface. Put a TLS-enabled reverse
+  proxy in front of it.
+- `ion-pulse-worker.service` runs scheduled publishing and AI jobs.
+
+Before installing, replace `/srv/ion-pulse-api`, `/etc/ion-pulse/api.env`, the `ion-pulse`
+user/group, and the `uv` path with values for the target host. The environment file must be
+readable only by the service account and contain the production database URL and secrets.
+Then install and start both services:
+
+```bash
+sudo install -m 0644 deploy/ion-pulse-api.service /etc/systemd/system/
+sudo install -m 0644 deploy/ion-pulse-worker.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now ion-pulse-api ion-pulse-worker
+```
+
+Confirm the deployment through the reverse proxy with `/api/v1/health` and `/api/v1/ready`.
 
 ## Checks
 
