@@ -96,6 +96,10 @@ every 30 seconds when idle (configure `ION_PULSE_WORKER_POLL_SECONDS` as needed)
 uv run python -m ion_pulse.workers.translation
 ```
 
+A systemd unit template is included at `deploy/ion-pulse-worker.service`. Install it alongside
+the API service, set its `WorkingDirectory`, user and `EnvironmentFile`, then enable it with
+`systemctl enable --now ion-pulse-worker`.
+
 ## Checks
 
 ```bash
