@@ -8,6 +8,14 @@ class AuthorApplicationCreate(BaseModel):
     motivation: str = Field(min_length=50, max_length=2000)
     portfolio_url: HttpUrl | None = None
 
+    @field_validator("motivation")
+    @classmethod
+    def normalize_motivation(cls, value: str) -> str:
+        normalized = value.strip()
+        if len(normalized) < 50:
+            raise ValueError("Motivation must contain at least 50 non-whitespace characters")
+        return normalized
+
 
 class AuthorApplicationRead(BaseModel):
     id: UUID
