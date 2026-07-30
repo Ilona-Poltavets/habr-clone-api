@@ -1,10 +1,14 @@
 import asyncio
 from types import SimpleNamespace
+from unittest.mock import AsyncMock
 from uuid import uuid4
+
+import pytest
 
 from ion_pulse.services.ai_reviews import route_completed_review
 from ion_pulse.services.openai_reviewer import parse_review_result
 from ion_pulse.services.openai_translator import parse_translation
+from ion_pulse.workers import translation as worker
 
 
 class Session:
@@ -84,3 +88,22 @@ def test_openai_translation_result_requires_all_content_fields() -> None:
     )
 
     assert translated.title == "English title"
+
+
+def test_worker_polls_when_idle_and_disposes_engine(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(worker, "get_settings", lambda: SimpleNamespace(worker_poll_seconds=30))
+    monkeypatch.setattr(worker, "run_once", AsyncMock(return_value=False))
+    dispose = AsyncMock()
+    monkeypatch.setattr(worker, "engine", SimpleNamespace(dispose=dispose))
+
+    async def stop_after_first_sleep(seconds: int) -> None:
+        assert seconds == 30
+        raise asyncio.CancelledError
+
+    monkeypatch.setattr(worker.asyncio, "sleep", stop_after_first_sleep)
+
+    with pytest.raises(asyncio.CancelledError):
+        asyncio.run(worker.main())
+
+    worker.run_once.assert_awaited_once()
+    dispose.assert_awaited_once()
