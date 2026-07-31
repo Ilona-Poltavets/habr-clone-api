@@ -37,5 +37,11 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.execute(
-        sa.text("DELETE FROM categories WHERE slug IN ('reviews', 'news', 'guides', 'esports')")
+        sa.text(
+            "DELETE FROM categories "
+            "WHERE slug IN ('reviews', 'news', 'guides', 'esports') "
+            "AND NOT EXISTS ("
+            "SELECT 1 FROM publications WHERE publications.category_id = categories.id"
+            ")"
+        )
     )
