@@ -25,3 +25,34 @@ jobs:
         run: uv run mypy src
       - name: Test
         run: uv run pytest
+
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: ion_pulse
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        options: >-
+          --health-cmd "pg_isready -U postgres -d ion_pulse"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    env:
+      ION_PULSE_DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/ion_pulse
+      ION_PULSE_RUN_INTEGRATION: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Install locked dependencies
+        run: uv sync --locked --all-groups
+      - name: Apply migrations
+        run: uv run alembic upgrade head
+      - name: Test public role workflow
+        run: uv run pytest -m integration

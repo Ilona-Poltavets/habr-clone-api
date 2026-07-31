@@ -98,7 +98,11 @@ async def register(
     await session.flush()
     token = await create_session(user, session)
     set_session_cookie(response, token)
-    return to_authenticated_user(user)
+    registered_user = await session.scalar(
+        select(User).options(selectinload(User.roles)).where(User.id == user.id)
+    )
+    assert registered_user is not None
+    return to_authenticated_user(registered_user)
 
 
 @router.post("/login", response_model=AuthenticatedUser)
